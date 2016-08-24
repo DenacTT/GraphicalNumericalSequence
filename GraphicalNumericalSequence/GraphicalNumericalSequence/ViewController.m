@@ -8,8 +8,21 @@
 
 #import "ViewController.h"
 #import "Animal.h"
+#import "GraphicalNumericalSequence-Swift.h"
 
-@interface ViewController ()
+
+@interface ViewController () <UITextFieldDelegate>
+
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentedSize;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentedType;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentedSingleDouble;
+
+@property (weak, nonatomic) IBOutlet UITextField *zodiacTextFild;
+@property (weak, nonatomic) IBOutlet UITextField *numberTextField;
+@property (weak, nonatomic) IBOutlet UITextField *moneyTextField;
+@property (weak, nonatomic) IBOutlet UITextField *yearTextField;
+
+@property (weak, nonatomic) IBOutlet UITextView *numberTextView;
 
 @property (strong, nonatomic) Animal * mouse;
 @property (strong, nonatomic) Animal * cow;
@@ -27,13 +40,14 @@
 @property (strong, nonatomic) NSArray * animalArray;
 
 @property (assign, nonatomic) int yearIndex;
-@property (assign, nonatomic) int index;
 
 @property (strong, nonatomic) NSDictionary * animalDic;
 
-@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentedSize;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentedSingleDouble;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentedType;
+@property (strong, nonatomic) DropDown * dropdown;
+
+@property (strong, nonatomic) NSString * sizeStr;
+@property (strong, nonatomic) NSString * typeStr;
+@property (assign, nonatomic) int singleDouble;
 
 @end
 
@@ -57,6 +71,8 @@
     
     self.animalDic = [[NSDictionary alloc]init];
     
+    self.dropdown = [[DropDown alloc]init];
+    
     int year = 1988;
     
     self.yearIndex = year % 12;
@@ -78,9 +94,6 @@
     
     self.animalArray = [[NSArray alloc]initWithObjects:self.monkey, self.chicken, self.dog, self.pig, self.mouse, self.cow, self.tiger, self.rabbit, self.dragon, self.snake, self.horse, self.sheep, nil];
     
-    NSArray * animalNamearray = [[NSArray alloc]initWithObjects:@"monkey", @"chicken", @"dog", @"pig", @"mouse", @"cow", @"tiger", @"rabbit", @"dragon", @"snake", @"horse", @"sheep", nil];
-    
-    self.index = 0;
     NSInteger twelve = 12;
     NSMutableArray * numberArray = [[NSMutableArray alloc]init];
     //    NSLog(@"animals:%@",self.animalArray);
@@ -105,32 +118,44 @@
         //        [self.animalDic setValue:animal forKey:@"animal"];
         
     }
-    
-//    删选
+    NSArray * animalNamearray = [[NSArray alloc]initWithObjects:@"monkey", @"chicken", @"dog", @"pig", @"mouse", @"cow", @"tiger", @"rabbit", @"dragon", @"snake", @"horse", @"sheep", nil];
+    //    删选
     NSDictionary *dictionary = [NSDictionary dictionaryWithObject:self.animalArray forKey:animalNamearray];
     
     for (NSArray * animalArray in [dictionary allValues]) {
-        //        NSLog(@"animalArray:%@",animalArray);
         
         //拿到所选动物
         for (Animal * animal in animalArray) {
             
             //删选家野
-            if ([animal.type isEqualToString:@"家"]) {
             
+            if (self.typeStr?[self.typeStr isEqualToString:animal.type]:YES) {
+                
                 //杀肖
                 if (![animal.name containsString:@"鸡"]) {
-                    NSLog(@"animal name:%@ type:%@ number:%@",animal.name,animal.type,animal.numberArray);
+//                    NSLog(@"animal name:%@ type:%@ number:%@",animal.name,animal.type,animal.numberArray);
                     
-                    //拿到所选生肖号码
-                    for (NSString * numberStr in animal.numberArray) {
-                        //                    NSLog(@"number:%d",[numberStr intValue]);
-                       //单双
-                        if (([numberStr intValue] % 2) == 1) {
-
-                            //大小
-                            if ([numberStr intValue] > 25) {
-                                [numberArray addObject:numberStr];
+                    //快速遍历所选生肖号码
+                    for (id numberStr in animal.numberArray) {
+//                        NSLog(@"number:%@",numberStr);
+                        
+                        //杀尾
+                        if (![[numberStr stringValue] hasSuffix:@"1"]) {
+                            NSLog(@"numberStr :%@ 单双:%d",numberStr,[numberStr intValue] % 2);
+                            
+                            //单双
+                            if (([numberStr intValue] % 2) == 0) {
+                                
+                                //大小
+                                if ([numberStr intValue] > 25) {
+                                    [numberArray addObject:numberStr];
+                                    if ([self.numberTextView.text isEqualToString:@""]) {
+                                        self.numberTextView.text = [numberStr stringValue];
+                                    } else {
+                                        NSString * textStr = [NSString stringWithFormat:@"%@,%@",self.numberTextView.text,[numberStr stringValue]];
+                                        self.numberTextView.text = textStr;
+                                    }
+                                }
                             }
                         }
                     }
@@ -138,6 +163,7 @@
             }
         }
     }
+    
     NSLog(@"numberArray:%@",numberArray);
 }
 
@@ -170,9 +196,129 @@
 - (IBAction)segmentedSizeAction:(id)sender {
     
 }
+
 - (IBAction)segmentedType:(UISegmentedControl *)sender {
+    //    sender.selectedSegmentIndex;
+    if (sender == self.segmentedSize) {
+//        sender.selectedSegmentIndex
+        switch (sender.selectedSegmentIndex) {
+            case 1: {
+                self.sizeStr = @"大";
+            }
+                break;
+                
+            case 2: {
+                self.sizeStr = @"小";
+            }
+                break;
+                
+            default: {
+            
+            }
+                break;
+        }
+    }
+    if (sender == self.segmentedType) {
+        switch (sender.selectedSegmentIndex) {
+            case 1: {
+                self.typeStr = @"家";
+            }
+                break;
+                
+            case 2: {
+                self.typeStr = @"野";
+            }
+                break;
+                
+            default: {
+                
+            }
+                break;
+        }
+    }
+    if (sender == self.segmentedSingleDouble) {
+        switch (sender.selectedSegmentIndex) {
+            case 1: {
+                self.singleDouble = 1;
+            }
+                break;
+                
+            case 2: {
+                self.singleDouble = 2;
+            }
+                break;
+                
+            default: {
+                
+            }
+                break;
+        }
+    }
     
 }
+
+- (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
+    __block id safeSelf = self;
+//    if (self.moneyTextField == textField){
+////        self.seleTextfield = textField;
+//        return YES;
+//        
+//    }
+//    if (self.yearTextField == textField){
+////        self.seleTextfield = textField;
+//        return YES;
+//        
+//    }
+    if (self.numberTextField == textField) {
+        [self textFieldResignFirst];
+        self.dropdown.anchorView = textField;
+        self.dropdown.dataSource = @[@"1",@"3",@"4",@"5",@"155",@"2"];
+        self.dropdown.selectionAction = ^(NSInteger index,NSString * indexStr){
+            [safeSelf setTextFieldStr:textField andDropdownStr:indexStr];
+        };
+        [self.dropdown show];
+        return NO;
+    }
+    if (self.zodiacTextFild == textField) {
+        [self textFieldResignFirst];
+        self.dropdown.anchorView = textField;
+        self.dropdown.dataSource = @[@"喵",@"喵1",@"喵4",@"喵5",@"喵155",@"喵2"];
+        self.dropdown.selectionAction = ^(NSInteger index,NSString * indexStr){
+            [safeSelf setTextFieldStr:textField andDropdownStr:indexStr];
+        };
+        [self.dropdown show];
+        return NO;
+    }
+    
+    
+    return YES;
+}
+
+#pragma mark - textFieldResignFirst
+- (void)textFieldResignFirst {
+    [self.yearTextField resignFirstResponder];
+    [self.moneyTextField resignFirstResponder];
+//    [self.]
+}
+
+-(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
+    [self textFieldResignFirst];
+}
+
+- (void)setTextFieldStr:(UITextField *)textField andDropdownStr:(NSString *)dropdownStr {
+    if ([textField.text isEqualToString:@""]) {
+        textField.text = dropdownStr;
+    } else {
+        if ([textField.text containsString:dropdownStr]) {
+            return;
+        } else {
+            NSString * textStr = [NSString stringWithFormat:@"%@,%@",textField.text,dropdownStr];
+            textField.text = textStr;
+        }
+    }
+}
+
+
 
 /**
  

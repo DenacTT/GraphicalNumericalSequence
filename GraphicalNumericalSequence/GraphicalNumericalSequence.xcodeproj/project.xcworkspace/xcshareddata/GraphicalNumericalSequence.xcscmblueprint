@@ -1,0 +1,29 @@
+{
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "26C521D832879CC41B183DDDFB092675F97D0B30" : 0,
+    "C02A04F69E879304AAF9D8EED0462858EEAABF4F" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "BD83F66F-5FBC-4173-AD88-91E6DD8A47A6",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "26C521D832879CC41B183DDDFB092675F97D0B30" : "",
+    "C02A04F69E879304AAF9D8EED0462858EEAABF4F" : "..\/coaltoelectricity"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "GraphicalNumericalSequence",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "GraphicalNumericalSequence.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:DenacTT\/number.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "26C521D832879CC41B183DDDFB092675F97D0B30"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "gitlab.xtremeprog.com:coaltoelectricity\/ios.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "C02A04F69E879304AAF9D8EED0462858EEAABF4F"
+    }
+  ]
+}
