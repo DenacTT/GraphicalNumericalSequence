@@ -19,7 +19,6 @@
 
 @property (weak, nonatomic) IBOutlet UITextField *zodiacTextFild;
 @property (weak, nonatomic) IBOutlet UITextField *numberTextField;
-@property (weak, nonatomic) IBOutlet UITextField *moneyTextField;
 @property (weak, nonatomic) IBOutlet UITextField *yearTextField;
 
 @property (weak, nonatomic) IBOutlet UITextView *numberTextView;
@@ -39,7 +38,8 @@
 
 @property (strong, nonatomic) NSArray * animalArray;
 
-@property (assign, nonatomic) int yearIndex;
+@property (assign, nonatomic) NSInteger yearIndex;
+@property (assign, nonatomic) NSInteger year;
 
 @property (strong, nonatomic) NSDictionary * animalDic;
 
@@ -47,9 +47,8 @@
 
 @property (strong, nonatomic) NSString * sizeStr;
 @property (strong, nonatomic) NSString * typeStr;
-@property (assign, nonatomic) int singleDouble;
+@property (assign, nonatomic) NSInteger singleDouble;
 
-@property (strong, nonatomic) UITextField * seleTextField;
 @end
 
 @implementation ViewController
@@ -74,9 +73,7 @@
     
     self.dropdown = [[DropDown alloc]init];
     
-    int year = 2016;
     
-    self.yearIndex = year % 12;
     //    NSLog(@"%d",self.yearIndex);
     
     [self setAnimal:self.monkey andName:@"猴" andType:@"野" andYearInadex:0];
@@ -95,9 +92,36 @@
     
     self.animalArray = @[self.monkey, self.sheep, self.horse ,  self.snake, self.dragon, self.rabbit, self.tiger, self.cow, self.mouse, self.pig, self.dog, self.chicken];
     
+    self.sizeStr = @"全";
+    self.typeStr = @"全";
+    self.singleDouble = 3;
+    [self relodeData];
+    
+    [self registerForKeyboardNotifications];
+    
+}
+
+
+
+- (void) relodeData {
+    
+    NSUserDefaults * ud = [NSUserDefaults standardUserDefaults];
+    if ([[ud stringForKey:@"year"] isEqualToString:@""]) {
+        self.year = 2016;
+        [ud setObject:[NSString stringWithFormat:@"%ld",(long)self.year] forKey:@"year"];
+        [ud synchronize]; //同步,写到磁盘中；
+        // getting an NSString
+        NSString *myString = [ud stringForKey:@"year"];
+        NSLog(@"%@",myString);
+    }
+    self.yearTextField.text = [ud stringForKey:@"year"];
+    self.year = [[ud stringForKey:@"year"] integerValue];
+    
+    self.yearIndex = self.year % 12;
+    
     NSInteger twelve = 12;
-//    NSMutableArray * numberArray = [[NSMutableArray alloc]init];
-//    NSLog(@"animals:%@",self.animalArray);
+    //    NSMutableArray * numberArray = [[NSMutableArray alloc]init];
+    //    NSLog(@"animals:%@",self.animalArray);
     for (Animal * animal in self.animalArray) {
         NSInteger index = [self.animalArray indexOfObject:animal];
         if (self.yearIndex == 0) {
@@ -119,26 +143,7 @@
         //        [self.animalDic setValue:animal forKey:@"animal"];
         
     }
-    self.sizeStr = @"全";
-    self.typeStr = @"全";
-    self.singleDouble = 3;
-    [self relodeData];
     
-    [self registerForKeyboardNotifications];
-    
-    NSUserDefaults * ud = [NSUserDefaults standardUserDefaults];
-    [ud setObject:[NSString stringWithFormat:@"%d",year] forKey:@"year"];
-    [ud synchronize]; //同步,写到磁盘中；
-    // getting an NSString
-    NSString *myString = [ud stringForKey:@"year"];
-    NSLog(@"%@",myString);
-    
-    
-}
-
-
-
-- (void) relodeData {
     self.numberTextView.text = nil;
     NSArray * animalNamearray = @[@"monkey", @"sheep", @"horse", @"snake", @"dragon", @"rabbit",  @"tiger", @"cow",@"mouse", @"pig", @"dog", @"chicken"];
     //    删选
@@ -197,19 +202,22 @@
             return (NSComparisonResult)NSOrderedSame;
     };
     
-    NSLog(@"paixu____numberArr:%@",numberArr);
+//    NSLog(@"paixu____numberArr:%@",numberArr);
     
     
     //数组排序：
     NSArray *resultArray = [numberArr sortedArrayUsingComparator:finderSort];
-    NSLog(@"第一种排序结果：%@",resultArray);
+    NSString * str = @"";
+    NSLog(@"排序结果：%@",resultArray);
     for (id number in resultArray) {
-        if ([self.numberTextView.text isEqualToString:@""]) {
-            self.numberTextView.text = [number stringValue];
+        if ([str isEqualToString:@""]) {
+            str = [NSString stringWithFormat:@"%@",number];
         } else {
-            self.numberTextView.text = [NSString stringWithFormat:@"%@,%@",self.numberTextView.text,[number stringValue]];
+            str = [NSString stringWithFormat:@"%@,%@",str,number];
         }
     }
+    self.numberTextView.text = [NSString stringWithFormat:@"%@    共:%lu个号码", str, (unsigned long)resultArray.count];
+
 }
 
 //尾数筛选
@@ -240,14 +248,15 @@
     //    NSValue *value = [info objectForKey:UIKeyboardFrameBeginUserInfoKey];
     //    CGPoint keyboardPoint = [value CGRectValue].origin;
     //    NSLog(@"keyBoard:%f  view.hiegth:%f", keyboardPoint.y,self.view.frame.size.height);  //216
-    
-    NSTimeInterval animationDuration=0.30f;
-    [UIView beginAnimations:@"ResizeForKeyboard" context:nil];
-    [UIView setAnimationDuration:animationDuration];
-    CGRect rect=CGRectMake(0.0f,0.0f,self.view.frame.size.width,self.view.frame.size.height);
-    self.view.frame=rect;
-    [self.view setNeedsLayout];
-    [UIView commitAnimations];
+    if(self.view.frame.size.height < 570) {
+        NSTimeInterval animationDuration = 0.30f;
+        [UIView beginAnimations:@"ResizeForKeyboard" context:nil];
+        [UIView setAnimationDuration:animationDuration];
+        CGRect rect=CGRectMake(0.0f,0.0f,self.view.frame.size.width,self.view.frame.size.height);
+        self.view.frame=rect;
+        [self.view setNeedsLayout];
+        [UIView commitAnimations];
+    }
 }
 
 - (void)keyboardWasHidden:(NSNotification *) notif{
@@ -259,14 +268,15 @@
     //    CGPoint keyboardPoint = [value CGRectValue].origin;
     //    NSLog(@"keyBoard:%f", keyboardPoint.y);  //216
     
-    
-    NSTimeInterval animationDuration=0.30f;
-    [UIView beginAnimations:@"ResizeForKeyboard" context:nil];
-    [UIView setAnimationDuration:animationDuration];
-    CGRect rect=CGRectMake(0.0f, -130,self.view.frame.size.width,self.view.frame.size.height);
-    self.view.frame=rect;
-    [self.view setNeedsLayout];
-    [UIView commitAnimations];
+    if(self.view.frame.size.height < 570) {
+        NSTimeInterval animationDuration = 0.30f;
+        [UIView beginAnimations:@"ResizeForKeyboard" context:nil];
+        [UIView setAnimationDuration:animationDuration];
+        CGRect rect=CGRectMake(0.0f, -130,self.view.frame.size.width,self.view.frame.size.height);
+        self.view.frame=rect;
+        [self.view setNeedsLayout];
+        [UIView commitAnimations];
+    }
 }
 
 #pragma mark - setAnimal
@@ -359,16 +369,7 @@
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
     __block id safeSelf = self;
-    self.seleTextField = textField;
-    if (self.moneyTextField == textField){
-        return YES;
-        
-    }
-    if (self.yearTextField == textField){
-        
-        return YES;
-        
-    }
+    
     if (self.numberTextField == textField) {
         [self textFieldResignFirst];
         NSArray * typeAnimalArray;
@@ -424,6 +425,26 @@
         [self.dropdown show];
         return NO;
     }
+    if (self.yearTextField == textField) {
+        [self textFieldResignFirst];
+        NSArray * typeAnimalArray = @[@"2016",@"2017",@"2018",@"2019",@"2020"];
+
+        self.dropdown.anchorView = textField;
+        self.dropdown.dataSource = typeAnimalArray;
+        self.dropdown.selectionAction = ^(NSInteger index,NSString * indexStr){
+            textField.text =  indexStr;
+            
+            NSUserDefaults * ud = [NSUserDefaults standardUserDefaults];
+            [ud setObject:[NSString stringWithFormat:@"%@",indexStr] forKey:@"year"];
+            [ud synchronize]; //同步,写到磁盘中；
+            [safeSelf relodeData];
+
+        };
+        [self.dropdown show];
+
+
+        return NO;
+    }
     
     return YES;
 }
@@ -434,8 +455,7 @@
 
 #pragma mark - textField
 - (void)textFieldResignFirst {
-    [self.yearTextField resignFirstResponder];
-    [self.moneyTextField resignFirstResponder];
+//    [self.yearTextField resignFirstResponder];
     [self.numberTextView resignFirstResponder];
 }
 
